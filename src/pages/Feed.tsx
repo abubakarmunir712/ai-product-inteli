@@ -8,11 +8,14 @@ import { StarInput, Stars } from '../components/Stars'
 import { compact, fmt1, ratingStats } from '../lib/utils'
 import { useMe, useStore } from '../store'
 
+// Stable fallback: a fresh [] inside a zustand selector re-renders forever
+const NO_FOLLOWS: string[] = []
+
 function ProfileCard() {
   const me = useMe()!
   const products = useStore((s) => s.products)
   const reviews = useStore((s) => s.reviews)
-  const follows = useStore((s) => s.follows[me.id] ?? [])
+  const follows = useStore((s) => s.follows[me.id] ?? NO_FOLLOWS)
   const m = useStore((s) => s.manufacturers.find((x) => x.id === me.manufacturerId))
   const mine = products.filter((p) => p.manufacturerId === me.manufacturerId)
   const stats = me.role === 'manufacturer'
@@ -97,7 +100,7 @@ function Sidebar() {
   const reviews = useStore((s) => s.reviews)
   const manufacturers = useStore((s) => s.manufacturers)
   const me = useMe()!
-  const follows = useStore((s) => s.follows[me.id] ?? [])
+  const follows = useStore((s) => s.follows[me.id] ?? NO_FOLLOWS)
   const toggleFollow = useStore((s) => s.toggleFollow)
   const newChat = useStore((s) => s.newChat)
   const nav = useNavigate()
@@ -156,7 +159,7 @@ function Sidebar() {
 export default function Feed() {
   const posts = useStore((s) => s.posts)
   const me = useMe()!
-  const follows = useStore((s) => s.follows[me.id] ?? [])
+  const follows = useStore((s) => s.follows[me.id] ?? NO_FOLLOWS)
   const accounts = useStore((s) => s.accounts)
   const [tab, setTab] = useState<'all' | 'following'>('all')
   const shown = tab === 'all' ? posts : posts.filter((p) => {
